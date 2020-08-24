@@ -15,7 +15,7 @@
  *
  */
 
-package io.dropwizard.maxmind.geoip2.core;
+package com.vertx.maxmind.geoip2.util;
 
 /**
  * @author phaneesh

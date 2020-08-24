@@ -14,13 +14,13 @@
  *  limitations under the License.
  *
  */
-package io.dropwizard.maxmind.geoip2.config;
+
+package com.vertx.maxmind.geoip2.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * @author phaneesh
@@ -29,21 +29,35 @@ import org.hibernate.validator.constraints.NotEmpty;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MaxMindConfig {
+public class MaxMindInfo {
 
-    @NotEmpty
-    private String databaseFilePath;
+    private boolean anonymousIp;
 
-    private String remoteIpHeader = "X-FORWARDED-FOR";
+    private boolean anonymousVpn;
 
-    private int cacheTTL = 300;
+    private boolean tor;
 
-    private int cacheMaxEntries = 10000;
+    private String city;
 
-    private boolean enterprise = false;
+    private String state;
 
-    //country, city, anonymous
-    private String type;
+    private String stateIso;
 
-    private boolean maxMindContext = false;
+    private String country;
+
+    private String countryIso;
+
+    private String postal;
+
+    private String userType;
+
+    private String connectionType;
+
+    private String isp;
+
+    private double latitude;
+
+    private double longitude;
+
+    private int accuracy;
 }
