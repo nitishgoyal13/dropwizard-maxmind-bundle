@@ -3,6 +3,7 @@ package com.vertx.maxmind.geoip2;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.inject.*;
 import com.maxmind.db.NodeCache;
 import com.maxmind.geoip2.DatabaseProvider;
 import com.maxmind.geoip2.DatabaseReader;
@@ -12,7 +13,6 @@ import com.vertx.maxmind.geoip2.filter.MaxMindFilter;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +32,8 @@ public class MaxMindVertxBundle {
     private DatabaseProvider databaseProvider;
 
     @Inject
-    public MaxMindVertxBundle(final MaxMindConfig config) {
-        this.config = config;
+    public MaxMindVertxBundle(final MaxMindConfig aConfig) {
+        this.config = aConfig;
     }
 
     public void init() {
@@ -44,7 +44,6 @@ public class MaxMindVertxBundle {
 
     private void initializeDataBase() {
         try {
-            log.info("Maxmind config is: {}", config);
             databaseProvider = new DatabaseReader.Builder(new File(config.getDatabaseFilePath()))
                     .withCache(new NodeCache() {
                         private Cache<Integer, JsonNode> cache = CacheBuilder.newBuilder()
