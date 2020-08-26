@@ -1,11 +1,7 @@
 package com.vertx.maxmind.geoip2.filter;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.maxmind.db.NodeCache;
-import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.DatabaseProvider;
 import com.maxmind.geoip2.model.AnonymousIpResponse;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.model.CountryResponse;
@@ -21,42 +17,17 @@ import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.InetAddressValidator;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class MaxMindVertxGeoIpRequestFilter implements MaxMindFilter {
-
     private final MaxMindConfig config;
-    private DatabaseReader databaseReader;
+    private final DatabaseProvider databaseProvider;
 
-    public MaxMindVertxGeoIpRequestFilter(final MaxMindConfig config) {
+    public MaxMindVertxGeoIpRequestFilter(final MaxMindConfig config, final DatabaseProvider databaseProvider) {
         this.config = config;
-        try {
-            this.databaseReader = new DatabaseReader.Builder(new File(config.getDatabaseFilePath()))
-                    .withCache(new NodeCache() {
-                        private Cache<Integer, JsonNode> cache = CacheBuilder.newBuilder()
-                                .expireAfterAccess(config.getCacheTTL(), TimeUnit.SECONDS)
-                                .maximumSize(config.getCacheMaxEntries())
-                                .recordStats()
-                                .build();
-
-                        @Override
-                        public JsonNode get(int i, Loader loader) throws IOException {
-                            try {
-                                return cache.get(i, () -> loader.load(i));
-                            } catch (ExecutionException e) {
-                                return null;
-                            }
-                        }
-                    })
-                    .build();
-        } catch (IOException e) {
-            log.error("Error initializing GeoIP database", e);
-        }
+        this.databaseProvider = databaseProvider;
     }
 
     @Override
@@ -107,7 +78,7 @@ public class MaxMindVertxGeoIpRequestFilter implements MaxMindFilter {
             }
             try {
                 if (config.isEnterprise()) {
-                    final EnterpriseResponse enterpriseResponse = databaseReader.enterprise(address);
+                    final EnterpriseResponse enterpriseResponse = databaseProvider.enterprise(address);
                     if (enterpriseResponse == null) {
                         return;
                     }
@@ -136,21 +107,21 @@ public class MaxMindVertxGeoIpRequestFilter implements MaxMindFilter {
                         addTraitsInfo(enterpriseResponse.getTraits(), routingContext);
                     }
 
-                    final AnonymousIpResponse anonymousIpResponse = databaseReader.anonymousIp(address);
+                    final AnonymousIpResponse anonymousIpResponse = databaseProvider.anonymousIp(address);
                     if (anonymousIpResponse != null) {
                         anonymousInfo(anonymousIpResponse, routingContext);
                     }
                 } else {
                     switch (config.getType()) {
                         case MaxMindConstants.COUNTRY_TEXT:
-                            final CountryResponse countryResponse = databaseReader.country(address);
+                            final CountryResponse countryResponse = databaseProvider.country(address);
                             if (countryResponse != null && countryResponse.getCountry() != null) {
                                 addCountryInfo(countryResponse.getCountry(), routingContext);
                             }
                             break;
 
                         case MaxMindConstants.CITY_TEXT:
-                            final CityResponse cityResponse = databaseReader.city(address);
+                            final CityResponse cityResponse = databaseProvider.city(address);
                             if (cityResponse != null) {
                                 if (cityResponse.getCountry() != null) {
                                     addCountryInfo(cityResponse.getCountry(), routingContext);
@@ -175,7 +146,7 @@ public class MaxMindVertxGeoIpRequestFilter implements MaxMindFilter {
                             break;
 
                         case MaxMindConstants.ANONYMOUS_TEXT:
-                            final AnonymousIpResponse anonymousIpResponse = databaseReader.anonymousIp(address);
+                            final AnonymousIpResponse anonymousIpResponse = databaseProvider.anonymousIp(address);
                             if (anonymousIpResponse != null) {
                                 anonymousInfo(anonymousIpResponse, routingContext);
                             }
