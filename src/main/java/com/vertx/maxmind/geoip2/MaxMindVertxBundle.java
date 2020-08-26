@@ -7,8 +7,8 @@ import com.maxmind.db.NodeCache;
 import com.maxmind.geoip2.DatabaseProvider;
 import com.maxmind.geoip2.DatabaseReader;
 import com.vertx.maxmind.geoip2.config.MaxMindConfig;
-import com.vertx.maxmind.geoip2.filter.MaxMindFilter;
 import com.vertx.maxmind.geoip2.filter.MaxMindVertxGeoIpRequestFilter;
+import com.vertx.maxmind.geoip2.filter.MaxMindFilter;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
