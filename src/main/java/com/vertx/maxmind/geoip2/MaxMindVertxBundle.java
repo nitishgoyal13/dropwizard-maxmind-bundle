@@ -44,6 +44,7 @@ public class MaxMindVertxBundle {
 
     private void initializeDataBase() {
         try {
+            log.info("Maxmind config is: {}", config);
             databaseProvider = new DatabaseReader.Builder(new File(config.getDatabaseFilePath()))
                     .withCache(new NodeCache() {
                         private Cache<Integer, JsonNode> cache = CacheBuilder.newBuilder()
