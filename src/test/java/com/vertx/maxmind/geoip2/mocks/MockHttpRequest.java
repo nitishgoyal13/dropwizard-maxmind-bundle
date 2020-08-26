@@ -12,6 +12,7 @@ import javax.net.ssl.SSLSession;
 import javax.security.cert.X509Certificate;
 import java.util.Map;
 
+@SuppressWarnings("deprecation")
 public class MockHttpRequest implements HttpServerRequest {
     private MultiMap headers;
 

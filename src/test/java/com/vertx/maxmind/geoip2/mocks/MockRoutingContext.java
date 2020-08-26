@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@SuppressWarnings("deprecation")
 public class MockRoutingContext implements RoutingContext {
     private MockHttpRequest httpRequest = new MockHttpRequest();
     private Map<String, Object> internalMap = new HashMap<>();
